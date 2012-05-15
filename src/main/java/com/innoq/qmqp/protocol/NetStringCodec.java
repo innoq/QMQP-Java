@@ -19,11 +19,11 @@ package com.innoq.qmqp.protocol;
 import java.lang.Math;
 
 /**
- * Simple Encoder for Netstrings as defined by http://cr.yp.to/proto/netstrings.txt
+ * Simple Encoder for NetStrings as defined by http://cr.yp.to/proto/netstrings.txt
  *
  * <p>Convenience methods and support for decoding may be added later.</p>
  */
-public class NetstringCodec {
+public class NetStringCodec {
 
     private static final double LN10 = Math.log(10);
 

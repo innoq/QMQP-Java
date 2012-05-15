@@ -19,23 +19,23 @@ package com.innoq.qmqp.protocol;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class NetstringCodecTest {
+public class NetStringCodecTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void doesntAcceptNullInput() {
-        new NetstringCodec().toNetString(null);
+        new NetStringCodec().toNetString(null);
     }
 
     @Test
     public void emptyInput() {
         Assert.assertArrayEquals(new byte[] { '0', ':', ',' },
-                                 new NetstringCodec().toNetString(new byte[0]));
+                                 new NetStringCodec().toNetString(new byte[0]));
     }
 
     @Test
     public void correctlyEncodes1Byte() {
         Assert.assertArrayEquals(new byte[] { '1', ':', 'a', ',' },
-                                 new NetstringCodec().toNetString(new byte[] {
+                                 new NetStringCodec().toNetString(new byte[] {
                                          'a'
                                      }));
     }
@@ -51,6 +51,6 @@ public class NetstringCodecTest {
         }
         expected[259] = ',';
         Assert.assertArrayEquals(expected,
-                                 new NetstringCodec().toNetString(input));
+                                 new NetStringCodec().toNetString(input));
     }
 }
