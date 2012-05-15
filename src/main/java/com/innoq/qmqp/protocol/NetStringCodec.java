@@ -22,6 +22,8 @@ import java.lang.Math;
  * Simple Encoder for NetStrings as defined by http://cr.yp.to/proto/netstrings.txt
  *
  * <p>Convenience methods and support for decoding may be added later.</p>
+ *
+ * <p>This class is considered internal, its API may change at any time.</p>
  */
 public class NetStringCodec {
 
