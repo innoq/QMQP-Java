@@ -25,6 +25,8 @@ import java.lang.Math;
  */
 public class NetstringCodec {
 
+    private static final double LN10 = Math.log(10);
+
     private static final byte COLON = ':';
     private static final byte COMMA = ',';
 
@@ -33,13 +35,16 @@ public class NetstringCodec {
      * a netstring.
      */
     public byte[] toNetString(byte[] orig) {
+        if (null == orig) {
+            throw new IllegalArgumentException("input must not be null");
+        }
         final int len = orig.length;
-        final int exp = (int) Math.log(len);
+        final int exp = len == 0 ? 0 : (int) (Math.log(len) / LN10);
         // (length marker takes exp + 1 bytes) + colon + original bytes + comma
         final int resLen = exp + 3 + len;
         final byte[] result = new byte[resLen];
         int remaining = len;
-        for (int i = 0; i <= exp; --i) {
+        for (int i = 0; i <= exp; i++) {
             int digit = remaining % 10;
             result[exp - i] = (byte) ('0' + digit);
             remaining /= 10;
