@@ -35,6 +35,8 @@ public class NetStringCodec {
     /**
      * Creates a new byte-array containing the given bytes encoded as
      * a netstring.
+     * @param orig the text to encode, must not be null
+     * @return the text as netstring, will not be null
      */
     public byte[] toNetString(byte[] orig) {
         if (null == orig) {

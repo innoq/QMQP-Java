@@ -46,6 +46,7 @@ public enum ReturnCode {
 
     /**
      * Parses a ReturnCode from the single character code.
+     * @throws IllegalArgumentException if the character code is unknown
      */
     public static ReturnCode fromCode(char c) {
         for (ReturnCode rc : values()) {

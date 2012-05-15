@@ -33,6 +33,9 @@ public class EightBitTextMessageCodec {
     /**
      * Transforms an array of bytes into an 8 bit text message in
      * which lines are separated by \012.
+     * @param the message to encode, may be null
+     * @return the original message unless it contains sequences of CR
+     *         and LF which are collapsed into single LFs
      */
     public byte[] toMessage(byte[] b) {
         if (b != null) {
