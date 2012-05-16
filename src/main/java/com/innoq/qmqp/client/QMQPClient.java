@@ -115,6 +115,9 @@ public class QMQPClient implements IQMQPClient {
         }
     }
 
+    /*
+     * TODO - find a better place for this code
+     */
     private static final int BUF_LEN = 8192;
 
     private byte[] readFully(InputStream is) throws IOException {
