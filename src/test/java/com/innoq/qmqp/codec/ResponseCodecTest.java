@@ -48,4 +48,10 @@ public class ResponseCodecTest {
         Assert.assertEquals("\u00e4", r.getDetails());
     }
 
+    @Test(expected=QMQPException.class)
+    public void failsOnNonUtf8() throws java.io.UnsupportedEncodingException {
+        Response r = new ResponseCodec().fromNetwork(new byte[] {
+                '2', ':', 'K', (byte) 255, ','
+            });
+    }
 }

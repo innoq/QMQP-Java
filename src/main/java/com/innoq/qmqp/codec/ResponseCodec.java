@@ -19,15 +19,26 @@ package com.innoq.qmqp.codec;
 import com.innoq.qmqp.protocol.QMQPException;
 import com.innoq.qmqp.protocol.Response;
 import com.innoq.qmqp.protocol.ReturnCode;
-import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
 
 /**
  * Decodes a QMQP Response from its network representation.
  */
 public class ResponseCodec {
 
+    private static final CharsetDecoder UTF8 =
+        Charset.forName("UTF-8").newDecoder();
+
+    static {
+        UTF8.onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT);
+    }
+
     private final NetStringCodec netString = new NetStringCodec();
-    private static final String UTF8 = "UTF8";
 
     /**
      * Decodes a QMQP Response from its network representation.
@@ -37,14 +48,13 @@ public class ResponseCodec {
      */
     public Response fromNetwork(byte[] response) throws QMQPException {
         try {
+            byte[] decodedBytes = netString.fromNetString(response);
             String message =
-                new String (netString.fromNetString(response), UTF8);
+                UTF8.decode(ByteBuffer.wrap(decodedBytes)).toString();
             return new Response(ReturnCode.fromCode(message.charAt(0)),
                                 message.substring(1));
-        } catch (UnsupportedEncodingException uex) {
-            // plain impossible
-            throw new RuntimeException("Huh, UTF-8 is not supported?",
-                                       uex);
+        } catch (CharacterCodingException uex) {
+            throw new QMQPException("Response wasn't encoded using UTF8", uex);
         }
     }
 

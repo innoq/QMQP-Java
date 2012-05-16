@@ -16,10 +16,17 @@
 
 package com.innoq.qmqp.protocol;
 
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+
 /**
  * Encapsulates a QMQP client request.
  */
 public final class Request {
+
+    private static final CharsetEncoder ASCII =
+        Charset.forName("ASCII").newEncoder();
+
     private final byte[] message;
     private final String sender;
     private final String[] recipients;
@@ -42,9 +49,21 @@ public final class Request {
         if (sender == null) {
             throw new IllegalArgumentException("Sender must not be null.");
         }
+        if (!ASCII.canEncode(sender)) {
+            throw new IllegalArgumentException("Sender '" + sender
+                                               + "' contains non-ASCII"
+                                               + " characters");
+        }
         if (recipients.length == 0) {
             throw new IllegalArgumentException("At least one recipient is"
                                                + " required.");
+        }
+        for (String r : recipients) {
+            if (!ASCII.canEncode(r)) {
+                throw new IllegalArgumentException("Recipient '"
+                                                   + r + "' contains non-ASCII"
+                                                   + " characters");
+            }
         }
         this.message = new byte[message.length];
         System.arraycopy(message, 0, this.message, 0, message.length);
