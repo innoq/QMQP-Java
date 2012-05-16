@@ -14,18 +14,19 @@
   limitations under the License.
 */
 
-package com.innoq.qmqp.client;
-
-import com.innoq.qmqp.protocol.QMQPException;
-import com.innoq.qmqp.protocol.Request;
-import com.innoq.qmqp.protocol.Response;
+package com.innoq.qmqp.protocol;
 
 /**
- * Interface for QMQPClient to simplify mock testing.
+ * Exception thrown by client in case of a communication or protocoll error.
  */
-public interface IQMQPClient {
-    /**
-     * Sends a message for queueing.
-     */
-    Response send(Request request) throws QMQPException;
+public class QMQPException extends RuntimeException {
+
+    public QMQPException(String message) {
+        super(message);
+    }
+
+    public QMQPException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

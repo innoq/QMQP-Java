@@ -16,7 +16,7 @@
 
 package com.innoq.qmqp.codec;
 
-import com.innoq.qmqp.client.QMQPException;
+import com.innoq.qmqp.protocol.QMQPException;
 import org.junit.Assert;
 import org.junit.Test;
 
