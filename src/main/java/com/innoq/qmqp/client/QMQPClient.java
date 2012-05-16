@@ -142,4 +142,21 @@ public class QMQPClient implements IQMQPClient {
             }
         }
     }
+
+    /*
+     * I'd love to avoid the duplication but Socket doesn't implement
+     * Closeable before Java7
+     */
+    private void close(Socket c, boolean swallowError) throws QMQPException {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (IOException ex) {
+                if (!swallowError) {
+                    throw new QMQPException("failed to close connection", ex);
+                }
+                // would hide a different exception, swallow here
+            }
+        }
+    }
 }
