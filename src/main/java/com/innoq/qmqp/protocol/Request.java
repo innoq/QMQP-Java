@@ -28,9 +28,12 @@ public final class Request {
      * Creates a request from a raw message, a required sender and at
      * least one recipient.
      * @param message the raw and unencoded message, must not be null.
-     * @param sender the envelope sender, must not be null.
+     * @param sender the envelope sender, must not be null, should
+     *        contain the bare address only, must not contain non-ASCII
+     *        chars.
      * @param recipients the envelope recipient addresses, at least
-     *        one is required.
+     *        one is required, each should contain the bare address
+     *        only, must not contain non-ASCII chars
      */
     public Request(byte[] message, String sender, String... recipients) {
         if (message == null) {
