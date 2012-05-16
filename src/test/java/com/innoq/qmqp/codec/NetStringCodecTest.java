@@ -14,7 +14,7 @@
   limitations under the License.
 */
 
-package com.innoq.qmqp.protocol;
+package com.innoq.qmqp.codec;
 
 import org.junit.Assert;
 import org.junit.Test;
