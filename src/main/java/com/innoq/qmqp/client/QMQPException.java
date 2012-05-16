@@ -21,6 +21,10 @@ package com.innoq.qmqp.client;
  */
 public class QMQPException extends RuntimeException {
 
+    public QMQPException(String message) {
+        super(message);
+    }
+
     public QMQPException(String message, Throwable cause) {
         super(message, cause);
     }
