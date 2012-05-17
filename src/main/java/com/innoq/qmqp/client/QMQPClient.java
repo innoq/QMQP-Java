@@ -21,12 +21,12 @@ import com.innoq.qmqp.codec.ResponseCodec;
 import com.innoq.qmqp.protocol.QMQPException;
 import com.innoq.qmqp.protocol.Request;
 import com.innoq.qmqp.protocol.Response;
+import com.innoq.qmqp.util.IOUtil;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 import java.net.Socket;
 
 /**
@@ -95,7 +95,7 @@ public class QMQPClient implements IQMQPClient {
             os = s.getOutputStream();
             os.write(request);
             is = s.getInputStream();
-            return readFully(is);
+            return IOUtil.readFully(is);
         } catch (IOException ex) {
             success = false;
             if (s == null) {
@@ -113,24 +113,6 @@ public class QMQPClient implements IQMQPClient {
             close(os, !success);
             close(s, !success);
         }
-    }
-
-    /*
-     * TODO - find a better place for this code
-     */
-    private static final int BUF_LEN = 8192;
-
-    private byte[] readFully(InputStream is) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buf = new byte[BUF_LEN];
-        int len = 0;
-        while (len >= 0) {
-            len = is.read(buf, 0, BUF_LEN);
-            if (len > 0) {
-                bos.write(buf, 0, len);
-            }
-        }
-        return bos.toByteArray();
     }
 
     private void close(Closeable c, boolean swallowError) throws QMQPException {

@@ -18,8 +18,7 @@ package com.innoq.qmqp.client;
 import com.innoq.qmqp.protocol.Request;
 import com.innoq.qmqp.protocol.Response;
 import com.innoq.qmqp.protocol.ReturnCode;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import com.innoq.qmqp.util.IOUtil;
 import java.io.IOException;
 
 /**
@@ -28,34 +27,17 @@ import java.io.IOException;
  * <p>Expects four args on the command line, hostname and port of
  * server, sender and recipient address. Reads the message to send
  * from stdin, sends the message and prints out the response.</p>
- *
- * <p>TODO: will be removed</p>
  */
 public class CLI {
-    private static final int BUF_LEN = 8192;
-
     public static void main(String[] args) throws IOException {
         if (args.length != 4) {
             System.err.println("host, port, sender and recipient are required");
             System.exit(2);
         }
         QMQPClient client = new QMQPClient(args[0], Integer.valueOf(args[1]));
-        Response r = client.send(new Request(readFully(System.in), args[2],
-                                             args[3]));
+        Response r = client.send(new Request(IOUtil.readFully(System.in),
+                                             args[2], args[3]));
         System.out.println(r.getReturnCode() + ": " + r.getDetails());
         System.exit(r.getReturnCode() == ReturnCode.OK ? 0 : 1);
-    }
-
-    private static byte[] readFully(InputStream is) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buf = new byte[BUF_LEN];
-        int len = 0;
-        while (len >= 0) {
-            len = is.read(buf, 0, BUF_LEN);
-            if (len > 0) {
-                bos.write(buf, 0, len);
-            }
-        }
-        return bos.toByteArray();
     }
 }
