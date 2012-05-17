@@ -56,4 +56,18 @@ public enum ReturnCode {
         }
         throw new IllegalArgumentException("Unknown code '" + c + "'");
     }
+
+    /**
+     * Has the message been queued?
+     */
+    public boolean isSuccess() {
+        return equals(ReturnCode.OK);
+    }
+
+    /**
+     * Is the result permanent?
+     */
+    public boolean isPermanent() {
+        return !equals(ReturnCode.TEMP_FAIL);
+    }
 }
