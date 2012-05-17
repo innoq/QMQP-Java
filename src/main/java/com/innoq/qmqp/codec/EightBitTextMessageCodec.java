@@ -22,10 +22,8 @@ import java.io.ByteArrayOutputStream;
  * Simple Encoder for 8 bit text messages as defined by http://cr.yp.to/proto/8bittext.html
  *
  * <p>Convenience methods and support for decoding may be added later.</p>
- *
- * <p>This class is considered internal, its API may change at any time.</p>
  */
-public class EightBitTextMessageCodec {
+class EightBitTextMessageCodec {
 
     private static final byte LF = 012;
     private static final byte CR = 015;

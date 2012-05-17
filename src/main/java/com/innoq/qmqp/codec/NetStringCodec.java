@@ -23,10 +23,8 @@ import java.lang.Math;
  * Simple Codec for NetStrings as defined by http://cr.yp.to/proto/netstrings.txt
  *
  * <p>Convenience methods may be added later.</p>
- *
- * <p>This class is considered internal, its API may change at any time.</p>
  */
-public class NetStringCodec {
+class NetStringCodec {
 
     private static final double LN10 = Math.log(10);
 
