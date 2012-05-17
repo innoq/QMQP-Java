@@ -54,4 +54,18 @@ public class ResponseCodecTest {
                 '2', ':', 'K', (byte) 255, ','
             });
     }
+
+    @Test
+    public void encodesOk() {
+        byte[] expected = new byte[] {
+                '1', '2', ':', 'K',
+                'A', 'l', 'l', ' ', 'i', 's', ' ', 'f', 'i', 'n', 'e',
+                ','
+            };
+        Assert.assertArrayEquals(expected,
+                                 new ResponseCodec()
+                                 .toNetwork(new Response(ReturnCode.OK,
+                                                         "All is fine")));
+    }
+
 }

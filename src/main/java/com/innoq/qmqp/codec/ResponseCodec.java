@@ -19,6 +19,7 @@ package com.innoq.qmqp.codec;
 import com.innoq.qmqp.protocol.QMQPException;
 import com.innoq.qmqp.protocol.Response;
 import com.innoq.qmqp.protocol.ReturnCode;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
@@ -26,7 +27,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 
 /**
- * Decodes a QMQP Response from its network representation.
+ * De/encodes a QMQP Response from/to its network representation.
  */
 public class ResponseCodec {
 
@@ -55,6 +56,23 @@ public class ResponseCodec {
                                 message.substring(1));
         } catch (CharacterCodingException uex) {
             throw new QMQPException("Response wasn't encoded using UTF8", uex);
+        }
+    }
+
+    /**
+     * Encodes a QMQP Response to its network representation.
+     * @param response the response to encode
+     * @return a network representation of the given response
+     */
+    public byte[] toNetwork(Response response) {
+        String msg = response.getReturnCode().getCode()
+            + response.getDetails();
+        try {
+            return netString.toNetString(msg.getBytes("UTF8"));
+        } catch (UnsupportedEncodingException uex) {
+            // plain impossible
+            throw new RuntimeException("Huh, UTF-8 is not supported?",
+                                       uex);
         }
     }
 
