@@ -66,48 +66,83 @@ class NetStringCodec {
      * @throws QMQPException if the netstring is malformed
      */
     public byte[] fromNetString(byte[] netstring) throws QMQPException {
-        if (null == netstring) {
-            throw new IllegalArgumentException("input must not be null");
-        }
-
-        final int inputLength = netstring.length;
-        /* minimal netsting is "0:," */
-        if (inputLength < 3) {
-            throw new QMQPException("netstring too small");
-        }
-
-        if (netstring[inputLength - 1] != COMMA) {
-            throw new QMQPException("Missing comma in netstring");
-        }
-        final int len = parseLength(netstring);
-        final int off = digitsInNumber(len);
-        if (inputLength != off + 2 + len) {
+        NetStringResult result = readNetString(netstring, 0);
+        if (netstring.length != result.endOffset) {
             throw new QMQPException("Length mismatch in netstring");
         }
-        if (netstring[off] != COLON) {
-            throw new QMQPException("Missing colon in netstring");
-        }
-
-        byte[] result = new byte[len];
-        if (len > 0) {
-            System.arraycopy(netstring, off + 1 , result, 0, len);
-        }
-        return result;
+        return result.data;
     }
 
     private int digitsInNumber(int number) {
         return number == 0 ? 1 : ((int) (Math.log(number) / LN10) + 1);
     }
 
-    private int parseLength(byte[] netstring) throws QMQPException {
+    /**
+     * Decodes a netstring that is contained inside given input and
+     * starts at index startOffset)
+     * @param input data containing the netstring
+     * @param startOffset start-index of the netstriung to decode
+     *        inside input
+     * @return the interpretation of the netstring and the index of
+     *         the first byte after the decoded netstring.
+     */
+    private NetStringResult readNetString(byte[] input, int startOffset) {
+        if (null == input) {
+            throw new IllegalArgumentException("input must not be null");
+        }
+
+        final int inputLength = input.length;
+        /* minimal netsting is "0:," */
+        if (inputLength - startOffset < 3) {
+            throw new QMQPException("netstring too small");
+        }
+
+        final NetStringInfo info = parseLength(input, startOffset);
+        if (input[info.dataStart - 1] != COLON) {
+            throw new QMQPException("Missing colon in netstring");
+        }
+        final int comma = info.dataStart + info.dataLength;
+        if (inputLength <= comma) {
+            throw new QMQPException("Length mismatch in netstring");
+        }
+        if (input[comma] != COMMA) {
+            throw new QMQPException("Missing comma in netstring");
+        }
+
+        byte[] result = new byte[info.dataLength];
+        if (info.dataLength > 0) {
+            System.arraycopy(input, info.dataStart, result, 0, info.dataLength);
+        }
+        return new NetStringResult(result, comma + 1);
+    }
+
+    private NetStringInfo parseLength(byte[] netstring, int startOffset)
+        throws QMQPException {
         final int len = netstring.length;
-        int accu = 0, i = 0;
+        int accu = 0, i = startOffset;
         for (; i < len && netstring[i] >= '0' && netstring[i] <= '9'; i++) {
             accu = accu * 10 + (netstring[i] - '0');
         }
         if (i == netstring.length) {
             throw new QMQPException("missing length");
         }
-        return accu;
+        return new NetStringInfo(i + 1, accu);
+    }
+
+    private static final class NetStringResult {
+        private final byte[] data;
+        private final int endOffset;
+        NetStringResult(byte[] result, int end) {
+            data = result;
+            endOffset = end;
+        }
+    }
+    private static final class NetStringInfo {
+        private final int dataStart;
+        private final int dataLength;
+        NetStringInfo(int start, int length) {
+            dataStart = start;
+            dataLength = length;
+        }
     }
 }
