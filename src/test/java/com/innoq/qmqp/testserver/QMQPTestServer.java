@@ -23,6 +23,7 @@ import com.innoq.qmqp.protocol.Request;
 import com.innoq.qmqp.protocol.Response;
 import com.innoq.qmqp.protocol.ReturnCode;
 import com.innoq.qmqp.util.IOUtil;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,6 +52,10 @@ public class QMQPTestServer {
      */
     public QMQPTestServer(int port) {
         this.port = port;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     /**
@@ -83,7 +88,7 @@ public class QMQPTestServer {
 
     private final class OneRequestThread extends Thread {
         private final TestRequestHandler handler;
-        private boolean up;
+        private volatile boolean up;
 
         OneRequestThread(TestRequestHandler h) {
             if (h == null) {
@@ -113,13 +118,11 @@ public class QMQPTestServer {
                     client = server.accept();
                     in = client.getInputStream();
                     out = client.getOutputStream();
-                    RequestCodec req = new RequestCodec();
                     ResponseCodec res = new ResponseCodec();
                     try {
-                        out.write(res.toNetwork(handler
-                                                .handle(req
-                                                        .fromNetwork(IOUtil
-                                                                     .readFully(in)))));
+                        Request req = readFully(in);
+                        Response response = handler.handle(req);
+                        out.write(res.toNetwork(response));
                     } catch (QMQPException q) {
                         out.write(res.toNetwork(new Response(ReturnCode.PERM_FAIL,
                                                              q.getMessage())));
@@ -137,5 +140,29 @@ public class QMQPTestServer {
                 caughtException(ex);
             }
         }
+    }
+
+    private static final int BUF_LEN = 8192;
+
+    private Request readFully(InputStream is) throws IOException {
+        RequestCodec req = new RequestCodec();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] buf = new byte[BUF_LEN];
+        byte[] bytesSoFar = null;
+        int len = 0;
+        while (len >= 0) {
+            len = is.read(buf, 0, BUF_LEN);
+            if (len > 0) {
+                bos.write(buf, 0, len);
+                bytesSoFar = bos.toByteArray();
+                try  {
+                    return req.fromNetwork(bytesSoFar);
+                } catch (QMQPException ex) {
+                    bos = new ByteArrayOutputStream();
+                    bos.write(bytesSoFar, 0, bytesSoFar.length);
+                }
+            }
+        }
+        throw new QMQPException("no request");
     }
 }
