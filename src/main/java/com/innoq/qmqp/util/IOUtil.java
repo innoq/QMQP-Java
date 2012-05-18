@@ -16,9 +16,13 @@
 
 package com.innoq.qmqp.util;
 
+import com.innoq.qmqp.protocol.QMQPException;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.InputStream;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * I/O utility functions.
@@ -44,6 +48,69 @@ public abstract class IOUtil {
         }
         return bos.toByteArray();
     }
+
+    /**
+     * Closes the given Closeable and swallows any exception thrown in
+     * close if swallowException asks for it.
+     * @throws QMQPException wrapping an IOException if close throws
+     *         an exception and swallowError is false
+     */
+    public static void close(Closeable c, boolean swallowError)
+        throws QMQPException {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (IOException ex) {
+                if (!swallowError) {
+                    throw new QMQPException("failed to close connection", ex);
+                }
+                // would hide a different exception, swallow here
+            }
+        }
+    }
+
+    /*
+     * I'd love to avoid the duplication but Socket doesn't implement
+     * Closeable before Java7
+     */
+
+    /**
+     * Closes the given Socket and swallows any exception thrown in
+     * close if swallowException asks for it.
+     * @throws QMQPException wrapping an IOException if close throws
+     *         an exception and swallowError is false
+     */
+    public static void close(Socket c, boolean swallowError)
+        throws QMQPException {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (IOException ex) {
+                if (!swallowError) {
+                    throw new QMQPException("failed to close connection", ex);
+                }
+                // would hide a different exception, swallow here
+            }
+        }
+    }
+
+    /**
+     * Closes the given Socket and swallows any exception thrown in
+     * close if swallowException asks for it.
+     * @throws QMQPException wrapping an IOException if close throws
+     *         an exception and swallowError is false
+     */
+    public static void close(ServerSocket c, boolean swallowError)
+        throws QMQPException {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (IOException ex) {
+                if (!swallowError) {
+                    throw new QMQPException("failed to close connection", ex);
+                }
+                // would hide a different exception, swallow here
+            }
+        }
+    }
 }
-
-

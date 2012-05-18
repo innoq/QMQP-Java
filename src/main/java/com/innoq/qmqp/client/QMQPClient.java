@@ -23,7 +23,6 @@ import com.innoq.qmqp.protocol.Request;
 import com.innoq.qmqp.protocol.Response;
 import com.innoq.qmqp.util.IOUtil;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -109,39 +108,10 @@ public class QMQPClient implements IQMQPClient {
             throw new QMQPException("Failed to read from " + serverName
                                     + ":" + port, ex);
         } finally {
-            close(is, !success);
-            close(os, !success);
-            close(s, !success);
+            IOUtil.close(is, !success);
+            IOUtil.close(os, !success);
+            IOUtil.close(s, !success);
         }
     }
 
-    private void close(Closeable c, boolean swallowError) throws QMQPException {
-        if (c != null) {
-            try {
-                c.close();
-            } catch (IOException ex) {
-                if (!swallowError) {
-                    throw new QMQPException("failed to close connection", ex);
-                }
-                // would hide a different exception, swallow here
-            }
-        }
-    }
-
-    /*
-     * I'd love to avoid the duplication but Socket doesn't implement
-     * Closeable before Java7
-     */
-    private void close(Socket c, boolean swallowError) throws QMQPException {
-        if (c != null) {
-            try {
-                c.close();
-            } catch (IOException ex) {
-                if (!swallowError) {
-                    throw new QMQPException("failed to close connection", ex);
-                }
-                // would hide a different exception, swallow here
-            }
-        }
-    }
 }
