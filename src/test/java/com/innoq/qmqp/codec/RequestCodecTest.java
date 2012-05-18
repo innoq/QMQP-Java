@@ -16,6 +16,7 @@
 
 package com.innoq.qmqp.codec;
 
+import com.innoq.qmqp.protocol.QMQPException;
 import com.innoq.qmqp.protocol.Request;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,6 +45,36 @@ public class RequestCodecTest {
             + recipient.length() + ":" + recipient + ",,";
         Assert.assertEquals(expected,
                             new String(new RequestCodec().toNetwork(r), "ASCII"));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void decoderDoesntAcceptNullInput() {
+        new RequestCodec().fromNetwork(null);
+    }
+
+    @Test(expected=QMQPException.class)
+    public void decoderDoesntAcceptNonsense() {
+        new RequestCodec().fromNetwork(new byte[] { '1', ':', 'a', ',' });
+    }
+
+    @Test
+    public void testRoundtrip() throws java.io.UnsupportedEncodingException {
+        String body = "Hi Bob,\n\n"
+            + "so happy to meet you again.\n\n"
+            + "Yours\n\n"
+            + "        Alice\n\n";
+        String sender = "alice@example.org";
+        String recipient = "bob@example.org";
+        Request expected =
+            new Request(body.getBytes("ASCII"), sender, recipient);
+        Request actual =
+            new RequestCodec().fromNetwork(new RequestCodec()
+                                           .toNetwork(expected));
+        Assert.assertNotSame(expected, actual);
+        Assert.assertArrayEquals(expected.getMessage(), actual.getMessage());
+        Assert.assertEquals(expected.getSender(), actual.getSender());
+        Assert.assertArrayEquals(expected.getRecipients(),
+                                 actual.getRecipients());
     }
 
 }

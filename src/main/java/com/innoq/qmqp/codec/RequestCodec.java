@@ -22,7 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Encodes a QMQP Request to its network representation.
+ * De/encodes a QMQP Request from/to its network representation.
  */
 public class RequestCodec {
 
@@ -54,6 +54,32 @@ public class RequestCodec {
         }
         byte[] body = inner.toByteArray();
         return netString.toNetString(body);
+    }
+
+    /**
+     * Decodes a QMQP Request from its network representation.
+     * @param request the netstring to decode, must not be null
+     * @return the contained request, will not be null
+     * @throws QMQPException if the netstring is malformed
+     */
+    public Request fromNetwork(byte[] request) {
+        byte[][] parts =
+            netString.splitNetStrings(netString.fromNetString(request));
+        if (parts.length < 3) {
+            throw new QMQPException("Request is malformed");
+        }
+        try {
+            String sender = new String(parts[1], ASCII);
+            String[] recipients = new String[parts.length - 2];
+            for (int i = 2; i < parts.length; i++) {
+                recipients[i - 2] = new String(parts[i], ASCII);
+            }
+            return new Request(parts[0], sender, recipients);
+        } catch (UnsupportedEncodingException uex) {
+            // plain impossible
+            throw new RuntimeException("Huh, ASCII is not supported?",
+                                       uex);
+        }
     }
 
     private void writeAsNetString(final ByteArrayOutputStream bos,
