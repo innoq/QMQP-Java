@@ -43,7 +43,8 @@ public class QMQPTestServer {
     }
 
     private final int port;
-    private ServerSocket server;
+    private volatile ServerSocket server;
+    private volatile QMQPException caughtException;
 
     /**
      * Initializes but doesn't start the server to listen on the given port.
@@ -53,39 +54,23 @@ public class QMQPTestServer {
     }
 
     /**
-     * Starts the server, handles a single request and then shuts down
-     * the server again.
+     * Starts the server in a separate thread which handles a single
+     * request and then shuts down the server again.
+     *
+     * <p>Waits until the server has been started before the method
+     * returns.</p>
      */
     public void handleOneRequest(TestRequestHandler handler) {
-        Socket client = null;
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            server = new ServerSocket(port);
-            client = server.accept();
-            if (handler == null) {
-                throw new QMQPException("missing handler");
+        OneRequestThread t = new OneRequestThread(handler);
+        t.start();
+        synchronized (t) {
+            while (!t.up && caughtException == null) {
+                try {
+                    t.wait();
+                } catch (InterruptedException ex) {
+                    break;
+                }
             }
-            in = client.getInputStream();
-            out = client.getOutputStream();
-            RequestCodec req = new RequestCodec();
-            ResponseCodec res = new ResponseCodec();
-            try {
-                out.write(res.toNetwork(handler
-                                        .handle(req
-                                                .fromNetwork(IOUtil
-                                                             .readFully(in)))));
-            } catch (QMQPException q) {
-                out.write(res.toNetwork(new Response(ReturnCode.PERM_FAIL,
-                                                     q.getMessage())));
-            }
-        } catch (IOException ex) {
-            throw new QMQPException("exception in server", ex);
-        } finally {
-            IOUtil.close(in, true);
-            IOUtil.close(out, true);
-            IOUtil.close(client, true);
-            stop();
         }
     }
 
@@ -97,4 +82,61 @@ public class QMQPTestServer {
         server = null;
     }
 
+    private final class OneRequestThread extends Thread {
+        private final TestRequestHandler handler;
+        private boolean up;
+
+        OneRequestThread(TestRequestHandler h) {
+            if (h == null) {
+                throw new QMQPException("missing handler");
+            }
+            this.handler = h;
+        }
+
+        private synchronized void isUp() {
+            up = true;
+            notifyAll();
+        }
+
+        private synchronized void caughtException(QMQPException ex) {
+            caughtException = ex;
+            notifyAll();
+        }
+
+        public void run() {
+            try {
+                Socket client = null;
+                InputStream in = null;
+                OutputStream out = null;
+                try {
+                    server = new ServerSocket(port);
+                    isUp();
+                    client = server.accept();
+                    in = client.getInputStream();
+                    out = client.getOutputStream();
+                    RequestCodec req = new RequestCodec();
+                    ResponseCodec res = new ResponseCodec();
+                    try {
+                        out.write(res.toNetwork(handler
+                                                .handle(req
+                                                        .fromNetwork(IOUtil
+                                                                     .readFully(in)))));
+                    } catch (QMQPException q) {
+                        out.write(res.toNetwork(new Response(ReturnCode.PERM_FAIL,
+                                                             q.getMessage())));
+                    }
+                } catch (IOException ex) {
+                    throw new QMQPException("exception in server", ex);
+                } finally {
+                    up = false;
+                    IOUtil.close(in, true);
+                    IOUtil.close(out, true);
+                    IOUtil.close(client, true);
+                    stop();
+                }
+            } catch (QMQPException ex) {
+                caughtException(ex);
+            }
+        }
+    }
 }
