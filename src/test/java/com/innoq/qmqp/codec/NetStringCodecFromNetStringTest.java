@@ -50,14 +50,14 @@ public class NetStringCodecFromNetStringTest {
     }
 
     @Test(expected=QMQPException.class)
-    public void throwsOnLengthToSmall() {
+    public void throwsOnLengthTooSmall() {
         new NetStringCodec().fromNetString(new byte[] {
                 '0', ':', 'a', ','
             });
     }
 
     @Test(expected=QMQPException.class)
-    public void throwsOnLengthToBig() {
+    public void throwsOnLengthTooBig() {
         new NetStringCodec().fromNetString(new byte[] {
                 '2', ':', 'a', ','
             });
