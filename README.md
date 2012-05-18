@@ -2,7 +2,7 @@ QMQP-Java
 =========
 
 This is a Java Client library for
-[QMQP|http://cr.yp.to/proto/qmqp.html], the "Quick Mail Queueing
+[QMQP](http://cr.yp.to/proto/qmqp.html), the "Quick Mail Queueing
 Protocol" supported by qmail and postfix.
 
 Usage
