@@ -57,8 +57,7 @@ public class QMQPTestServer {
      * Starts the server in a separate thread which handles a single
      * request and then shuts down the server again.
      *
-     * <p>Waits until the server has been started before the method
-     * returns.</p>
+     * <p>Waits for the server to start before the method returns.</p>
      */
     public void handleOneRequest(TestRequestHandler handler) {
         OneRequestThread t = new OneRequestThread(handler);
