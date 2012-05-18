@@ -93,6 +93,7 @@ public class QMQPClient implements IQMQPClient {
             s = new Socket(serverName, port);
             os = s.getOutputStream();
             os.write(request);
+            os.flush();
             is = s.getInputStream();
             return IOUtil.readFully(is);
         } catch (IOException ex) {
