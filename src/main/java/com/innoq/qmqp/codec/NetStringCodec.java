@@ -18,6 +18,8 @@ package com.innoq.qmqp.codec;
 
 import com.innoq.qmqp.protocol.QMQPException;
 import java.lang.Math;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple Codec for NetStrings as defined by http://cr.yp.to/proto/netstrings.txt
@@ -71,6 +73,28 @@ class NetStringCodec {
             throw new QMQPException("Length mismatch in netstring");
         }
         return result.data;
+    }
+
+    /**
+     * Assumes the input consists of concatenated netstrings, splits
+     * them and returns the decoded "interpretations".
+     * @param netstrings the netstrings to decode, must not be null
+     * @return the interpretations of the netstrings, will not be null
+     * @throws QMQPException if any of the netstrings is malformed
+     */
+    public byte[][] splitNetStrings(byte[] netstrings) throws QMQPException {
+        if (null == netstrings) {
+            throw new IllegalArgumentException("input must not be null");
+        }
+        List<byte[]> result = new ArrayList<byte[]>();
+        final int len = netstrings.length;
+        int nextOffset = 0;
+        while (nextOffset < len) {
+            NetStringResult oneString = readNetString(netstrings, nextOffset);
+            result.add(oneString.data);
+            nextOffset = oneString.endOffset;
+        }
+        return result.toArray(new byte[0][]);
     }
 
     private int digitsInNumber(int number) {

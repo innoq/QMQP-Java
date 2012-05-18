@@ -98,4 +98,89 @@ public class NetStringCodecFromNetStringTest {
         Assert.assertArrayEquals(expected,
                                  new NetStringCodec().fromNetString(input));
     }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void splitDoesntAcceptNullInput() {
+        new NetStringCodec().splitNetStrings(null);
+    }
+
+    @Test(expected=QMQPException.class)
+    public void splitThrowsOnMissingLength() {
+        new NetStringCodec().splitNetStrings(new byte[] {
+                '1', ':', 'a', ',',
+                ':', ','
+            });
+    }
+
+    @Test(expected=QMQPException.class)
+    public void splitThrowsOnMissingColon() {
+        new NetStringCodec().splitNetStrings(new byte[] {
+                '1', ':', 'a', ',',
+                '1', '2'
+            });
+    }
+
+    @Test(expected=QMQPException.class)
+    public void splitThrowsOnNonNumericLength() {
+        new NetStringCodec().splitNetStrings(new byte[] {
+                '1', ':', 'a', ',',
+                1, ':', 'a', ','
+            });
+    }
+
+    @Test(expected=QMQPException.class)
+    public void splitThrowsOnLengthTooSmall() {
+        new NetStringCodec().splitNetStrings(new byte[] {
+                '1', ':', 'a', ',',
+                '0', ':', 'a', ','
+            });
+    }
+
+    @Test(expected=QMQPException.class)
+    public void splitThrowsOnLengthTooBig() {
+        new NetStringCodec().splitNetStrings(new byte[] {
+                '1', ':', 'a', ',',
+                '2', ':', 'a', ','
+            });
+    }
+
+    @Test(expected=QMQPException.class)
+    public void splitThrowsOnMissingTerminator() {
+        new NetStringCodec().splitNetStrings(new byte[] {
+                '1', ':', 'a', ',',
+                '1', ':', 'a', 0
+            });
+    }
+
+    @Test
+    public void splitEmptyInput() {
+        byte[][] expected = new byte[1][];
+        expected[0] = new byte[0];
+        Assert.assertArrayEquals(expected,
+                                 new NetStringCodec()
+                                 .splitNetStrings(new byte[] { '0', ':', ',' }));
+    }
+
+    @Test
+    public void splitCorrectlyDecodes1Byte() {
+        byte[][] expected = new byte[1][];
+        expected[0] = new byte[] { 'a' };
+        Assert.assertArrayEquals(expected,
+                                 new NetStringCodec().splitNetStrings(new byte[] {
+                                         '1', ':', 'a', ','
+                                     }));
+    }
+
+
+    @Test
+    public void splitCorrectlyMultipleNetStrings() {
+        byte[][] expected = new byte[2][];
+        expected[0] = new byte[] { 'a' };
+        expected[1] = new byte[] { 'b', (byte) 128 };
+        Assert.assertArrayEquals(expected,
+                                 new NetStringCodec().splitNetStrings(new byte[] {
+                                         '1', ':', 'a', ',',
+                                         '2', ':', 'b', (byte) 128, ','
+                                     }));
+    }
 }
