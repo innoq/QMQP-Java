@@ -12,20 +12,21 @@ Basic Library
 -------------
 
 The main entry point to the library is the `QMQPClient` class in the
-'com.innoq.qmqp.client' package along with the classes inside the
+`com.innoq.qmqp.client` package along with the classes inside the
 `com.innoq.qmqp.protocol` package.  Any other class is only public as
 an implementation detail.
 
 A message to be queued consists of the message itself as `byte`s -
 this is the raw message and must be understood by the mail server you
 want to queue the message to - the sender's address and a list of
-recipients addresses.  At least one recipient is required.  Any
+recipient addresses.  At least one recipient is required.  Any
 address must only consist of ASCII characters, the library does
 enforce this but doesn't validate the address' syntax.
 
 In order to queue a message to a mail server you create an instance of
-the `QMQPClient` class specifiying the hostname and port of the server
-to queue to.
+the `QMQPClient` class optionally specifiying the hostname and port of
+the server to queue to.  It defaults to "localhost" and port 628
+respectively.
 
 `QMQPClient`'s `send` method will create a new socket connection to
 the server for each call, send the request, parse the reponse and
@@ -33,8 +34,8 @@ close the connection again.  Any exception that may occur will be
 wrapped in a `QMQPException` which is a non-checked
 `RuntimeException`.
 
-In its most simple form sending a message to a QMQP server listening
-on the default port 628 at localhost will be along the lines of
+In its most simple form sending a message to a QMQP server will be
+along the lines of
 
     String msg = "Subject: Hello world\n"
            + "\n"
@@ -58,12 +59,12 @@ server as well as sender and recipient addresses as command line args
 and reads the message from stdin.
 
 The tests jar also contains a very lightly tested server that may be
-useful as part of unit test.
+useful as part of unit tests.
 
 Known Limitations
 =================
 
-* The client relies in the server to close the connection after sending
+* The client relies on the server to close the connection after sending
   the response.  In particular it doesn't close the connection by
   itself even after an hour.
 
