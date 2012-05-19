@@ -102,20 +102,12 @@
   </build>
 
   <profiles>
-    <!-- profile only enabled when performing a release, creates
-         checksums and a tests jar -->
+    <!-- profile only enabled when performing a release, creates tests
+         jars -->
     <profile>
       <id>release</id>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-release-plugin</artifactId>
-            <version>2.3</version>
-            <configuration>
-              <releaseProfiles>release</releaseProfiles>
-            </configuration>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -127,12 +119,6 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
-          <plugin>
-            <artifactId>maven-install-plugin</artifactId>
-            <configuration>
-              <createChecksum>true</createChecksum>
-            </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
