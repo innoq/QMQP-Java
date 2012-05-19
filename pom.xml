@@ -31,6 +31,7 @@
   <name>qmqp-client</name>
   <description>QMQP Client Library for Java</description>
   <url>https://github.com/innoq/QMQP-Java</url>
+
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -38,11 +39,20 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <scm>
     <connection>scm:git:git@github.com:innoq/QMQP-Java.git</connection>
     <developerConnection>scm:git:git@github.com:innoq/QMQP-Java.git</developerConnection>
     <url>git@github.com:innoq/QMQP-Java.git</url>
   </scm>
+
+  <organization>
+    <name>innoQ Deutschland GmbH</name>
+    <url>http://innoq.com/</url>
+  </organization>
+
+  <!-- Personally I'm not fond of the developers section but Sonatype's OSSRH
+       requires it -->
   <developers>
     <developer>
       <id>bodewig</id>
@@ -50,6 +60,7 @@
       <email>stefan.bodewig@innoq dot com</email>
     </developer>
   </developers>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -60,7 +71,7 @@
   </dependencies>
 
   <build>
-    <!-- Add N&L files to jars -->
+    <!-- Add N&L files to jars so they get the copyright notice -->
     <resources>
       <resource>
         <directory>${basedir}</directory>
@@ -91,6 +102,8 @@
   </build>
 
   <profiles>
+    <!-- profile only enabled when performing a release, creates
+         checksums and a tests jar -->
     <profile>
       <id>release</id>
       <build>
