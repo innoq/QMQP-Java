@@ -61,6 +61,13 @@ and reads the message from stdin.
 The tests jar also contains a very lightly tested server that may be
 useful as part of unit tests.
 
+Obtaining
+---------
+
+Currently there are only two ways to get the QMQP Client Library,
+either you build it from source or you pick up the jar from a Maven
+repository near you.
+
 Known Limitations
 =================
 
@@ -77,8 +84,8 @@ Known Limitations
 Release History
 ===============
 
-0.1 Released at - not yet -
----------------------------
+0.1 Released 2012-05-21
+-----------------------
 
 First public release of the code, functionally complete.
 
