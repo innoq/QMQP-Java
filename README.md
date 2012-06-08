@@ -66,7 +66,8 @@ Obtaining
 
 Currently there are only two ways to get the QMQP Client Library,
 either you build it from source or you pick up the jar from a Maven
-repository near you.
+repository near you.  The releases are available from Maven Central
+using the groupId `com.innoq.qmqp` and artifactId `qmqp-client`.
 
 Known Limitations
 =================
