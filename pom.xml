@@ -18,9 +18,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <groupId>com.innoq</groupId>
+    <artifactId>innoq-oss-parent</artifactId>
+    <version>1-SNAPSHOT</version>
   </parent>
 
   <groupId>com.innoq.qmqp</groupId>
@@ -31,24 +31,11 @@
   <description>QMQP Client Library for Java</description>
   <url>https://github.com/innoq/QMQP-Java</url>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
   <scm>
     <connection>scm:git:git@github.com:innoq/QMQP-Java.git</connection>
     <developerConnection>scm:git:git@github.com:innoq/QMQP-Java.git</developerConnection>
     <url>git@github.com:innoq/QMQP-Java.git</url>
   </scm>
-
-  <organization>
-    <name>innoQ Deutschland GmbH</name>
-    <url>http://innoq.com/</url>
-  </organization>
 
   <!-- Personally I'm not fond of the developers section but Sonatype's OSSRH
        requires it -->
