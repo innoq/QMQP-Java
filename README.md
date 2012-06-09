@@ -85,6 +85,11 @@ Known Limitations
 Release History
 ===============
 
+0.2 Released 2012-06-09
+-----------------------
+
+Changed parent POM to use new innoQ parent, no code changes.
+
 0.1 Released 2012-05-21
 -----------------------
 
