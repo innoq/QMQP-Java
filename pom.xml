@@ -20,7 +20,7 @@
   <parent>
     <groupId>com.innoq</groupId>
     <artifactId>innoq-oss-parent</artifactId>
-    <version>1-SNAPSHOT</version>
+    <version>1</version>
   </parent>
 
   <groupId>com.innoq.qmqp</groupId>
