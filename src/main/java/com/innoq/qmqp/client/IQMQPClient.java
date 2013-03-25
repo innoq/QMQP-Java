@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012 innoQ Deutschland GmbH
+  Copyright (C) 2012-2013 innoQ Deutschland GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -28,4 +28,16 @@ public interface IQMQPClient {
      * Sends a message for queueing.
      */
     Response send(Request request) throws QMQPException;
+    /**
+     * Sets the connect timeout for the client in milliseconds.
+     *
+     * <p>A value &lt;= 0 means no timeout at all.</p>
+     */
+    void setConnectTimeout(int timeout);
+    /**
+     * Sets the read timeout for the client in milliseconds.
+     *
+     * <p>A value &lt;= 0 means no timeout at all.</p>
+     */
+    void setReadTimeout(int timeout);
 }

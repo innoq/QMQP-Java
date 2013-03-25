@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012 innoQ Deutschland GmbH
+  Copyright (C) 2012-2013 innoQ Deutschland GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import com.innoq.qmqp.util.IOUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -42,6 +43,7 @@ public class QMQPClient implements IQMQPClient {
 
     private final String serverName;
     private final int port;
+    private int readTimeout, connectTimeout;
 
     /**
      * Sets up a client to send messages to localhost's port 628.
@@ -84,13 +86,36 @@ public class QMQPClient implements IQMQPClient {
         return respCodec.fromNetwork(send(reqCodec.toNetwork(request)));
     }
 
+    /**
+     * Sets the connect timeout for the client in milliseconds.
+     *
+     * <p>A value &lt;= 0 means no timeout at all.</p>
+     */
+    public void setConnectTimeout(int timeout) {
+        connectTimeout = timeout;
+    }
+
+    /**
+     * Sets the read timeout for the client in milliseconds.
+     *
+     * <p>A value &lt;= 0 means no timeout at all.</p>
+     */
+    public void setReadTimeout(int timeout) {
+        readTimeout = timeout;
+    }
+
     private byte[] send(byte[] request) {
         Socket s = null;
         OutputStream os = null;
         InputStream is = null;
         boolean success = true;
         try {
-            s = new Socket(serverName, port);
+            InetSocketAddress addr = new InetSocketAddress(serverName, port);
+            s = new Socket();
+            if (readTimeout > 0) {
+                s.setSoTimeout(readTimeout);
+            }
+            s.connect(addr, connectTimeout > 0 ? connectTimeout : 0);
             os = s.getOutputStream();
             os.write(request);
             os.flush();
@@ -98,7 +123,7 @@ public class QMQPClient implements IQMQPClient {
             return IOUtil.readFully(is);
         } catch (IOException ex) {
             success = false;
-            if (s == null) {
+            if (s == null || !s.isConnected()) {
                 throw new QMQPException("Failed to connect to " + serverName
                                         + ":" + port, ex);
             }
