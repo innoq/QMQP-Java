@@ -85,7 +85,7 @@ Known Limitations
 Release History
 ===============
 
-0.3 Released 2013-??
+0.3 Released 2013-03-26
 -----------------------
 
 Added optional connect and read timeouts to the client.
