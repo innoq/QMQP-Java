@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012 innoQ Deutschland GmbH
+  Copyright (C) 2012-2013 innoQ Deutschland GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class QMQPTestServer {
         public Response handle(Request r) throws QMQPException;
     }
 
-    private final int port;
+    private final int port, writeDelay;
     private volatile ServerSocket server;
     private volatile QMQPException caughtException;
 
@@ -51,7 +51,16 @@ public class QMQPTestServer {
      * Initializes but doesn't start the server to listen on the given port.
      */
     public QMQPTestServer(int port) {
+        this(port, 0);
+    }
+
+    /**
+     * Initializes but doesn't start the server to listen on the given
+     * port, configures a delay before writing to the socket.
+     */
+    public QMQPTestServer(int port, int writeDelay) {
         this.port = port;
+        this.writeDelay = writeDelay;
     }
 
     public int getPort() {
@@ -122,12 +131,17 @@ public class QMQPTestServer {
                     try {
                         Request req = readFully(in);
                         Response response = handler.handle(req);
+                        if (writeDelay > 0) {
+                            Thread.sleep(writeDelay);
+                        }
                         out.write(res.toNetwork(response));
                     } catch (QMQPException q) {
                         out.write(res.toNetwork(new Response(ReturnCode.PERM_FAIL,
                                                              q.getMessage())));
                     }
                 } catch (IOException ex) {
+                    throw new QMQPException("exception in server", ex);
+                } catch (InterruptedException ex) {
                     throw new QMQPException("exception in server", ex);
                 } finally {
                     up = false;

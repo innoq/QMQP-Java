@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012 innoQ Deutschland GmbH
+  Copyright (C) 2012-2013 innoQ Deutschland GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -26,38 +26,64 @@ import java.util.Random;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class QMQPClientTest {
 
     private static final Random RAND = new Random();
+    private static final String SENDER = "bar@baz";
     private QMQPTestServer server;
 
-    @Before
-    public void initializeServer() {
-        server = new QMQPTestServer(RAND.nextInt(Character.MAX_VALUE - 1024)
-                                    + 1024);
-    }
-
     @After
-    public void shhutdownServer() {
-        server.stop();
+    public void shutdownServer() {
+        if (server != null) {
+            server.stop();
+        }
     }
 
     @Test
     public void whenThingsGoWell() {
+        initializeServer(0);
+        assertCorrectExecution(0);
+    }
+
+    @Test
+    public void timeoutButNoDelay() {
+        initializeServer(0);
+        assertCorrectExecution(1000);
+    }
+
+    @Test
+    public void writeDelayButNoTimeout() {
+        initializeServer(3000);
+        assertCorrectExecution(0);
+    }
+
+    @Test(expected = QMQPException.class)
+    public void readDelayWithTimeout() {
+        initializeServer(3000);
+        sendRequest(1000);
+    }
+
+    private void initializeServer(int writeDelay) {
+        server = new QMQPTestServer(RAND.nextInt(Character.MAX_VALUE - 1024)
+                                    + 1024, writeDelay);
+    }
+
+    private void assertCorrectExecution(int readTimeout) {
+        Response res = sendRequest(readTimeout);
+        Assert.assertEquals(ReturnCode.OK, res.getReturnCode());
+        Assert.assertEquals(SENDER, res.getDetails());
+    }
+
+    private Response sendRequest(int readTimeout) {
         QMQPClient client = new QMQPClient(server.getPort());
+        client.setReadTimeout(readTimeout);
         server.handleOneRequest(new QMQPTestServer.TestRequestHandler() {
                 public Response handle(Request r) {
                     return new Response(ReturnCode.OK, r.getSender());
                 }
             });
-        String sender = "bar@baz";
-        Response res = client.send(new Request(new byte[0], sender,
-                                               "foo@example.org"));
-        Assert.assertEquals(ReturnCode.OK, res.getReturnCode());
-        Assert.assertEquals(sender, res.getDetails());
+        return client.send(new Request(new byte[0], SENDER, "foo@example.org"));
     }
-
 }
