@@ -8,6 +8,11 @@ only gladly accept
 [pull requests](https://github.com/innoq/QMQP-Java/pulls), we prefer
 them for smaller changes.
 
+We ask all contributors to sign a contributor agreement by registered
+as [TOSSCA contributors](http://www.tossca.org/kontribution/)
+themselves or by being listed as contributors by a company that has
+signed the CA.
+
 Before you start working on a big feature, please open an issue and
 tell tell us about, though.  This way you can make sure you're not
 wasting your time on something that isn't considered to be in the
