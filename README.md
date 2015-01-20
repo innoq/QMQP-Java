@@ -103,6 +103,8 @@ First public release of the code, functionally complete.
 Legal
 =====
 
+  This software is licensed to You by TOOSCA e.V. - http://www.tossca.org/
+
   Copyright (C) 2012-2015 innoQ Deutschland GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License");
