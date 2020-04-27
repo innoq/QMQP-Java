@@ -103,8 +103,6 @@ First public release of the code, functionally complete.
 Legal
 =====
 
-  This software is licensed to You by TOOSCA e.V. - http://www.tossca.org/
-
   Copyright (C) 2012-2015, 2020 innoQ Deutschland GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,6 +117,3 @@ Legal
   See the License for the specific language governing permissions and
   limitations under the License.
 
-All contributors to the QMQP library are either
-[TOSSCA contributors](http://www.tossca.org/kontribution/) themselves
-or are listed as contributors by a company that has signed the CA.
