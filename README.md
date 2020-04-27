@@ -105,7 +105,7 @@ Legal
 
   This software is licensed to You by TOOSCA e.V. - http://www.tossca.org/
 
-  Copyright (C) 2012-2015 innoQ Deutschland GmbH
+  Copyright (C) 2012-2015, 2020 innoQ Deutschland GmbH
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
